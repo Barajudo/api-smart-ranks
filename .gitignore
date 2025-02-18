@@ -1,0 +1,20 @@
+# .gitignore
+# dependencies
+/node_modules
+/dist
+
+# environment
+.env
+
+# IDE
+/.idea
+/.vscode
+*.sublime-workspace
+
+# logs
+logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store

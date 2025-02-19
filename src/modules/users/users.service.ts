@@ -23,8 +23,7 @@ export class UsersService {
   }
 
   async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.userModel.find();
-    console.log({ users });
+    const users = await this.userModel.find({ isActive: true });
     return users.map((user: User) => new UserResponseDto(user.toJSON()));
   }
 

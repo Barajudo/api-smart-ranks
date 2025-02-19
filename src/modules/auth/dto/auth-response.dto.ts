@@ -11,6 +11,9 @@ export class AuthResponseDto {
   @ApiProperty({ enum: UserRole })
   role: UserRole;
 
+  @ApiProperty()
+  _id: string;
+
   constructor(partial: Partial<AuthResponseDto>) {
     Object.assign(this, partial);
   }

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Invoice } from './entities/invoice.entity';
@@ -17,18 +13,13 @@ export class InvoicesService {
     private readonly productsService: ProductsService,
   ) {}
 
-  async create(
-    userId: string,
-    createInvoiceDto: CreateInvoiceDto,
-  ): Promise<InvoiceResponseDto> {
+  async create(userId: string, createInvoiceDto: CreateInvoiceDto): Promise<InvoiceResponseDto> {
     const items = await Promise.all(
-      createInvoiceDto.items.map(async (item) => {
+      createInvoiceDto.items.map(async item => {
         const product = await this.productsService.findOne(item.productId);
 
         if (product.stock < item.quantity) {
-          throw new BadRequestException(
-            `Insufficient stock for product ${product.name}`,
-          );
+          throw new BadRequestException(`Insufficient stock for product ${product.name}`);
         }
         await this.productsService.updateStock(item.productId, item.quantity);
 
@@ -53,18 +44,12 @@ export class InvoicesService {
   }
 
   async findAll(): Promise<InvoiceResponseDto[]> {
-    const invoices = await this.invoiceModel
-      .find()
-      .populate('userId', 'name email');
-    return invoices.map(
-      (invoice: Invoice) => new InvoiceResponseDto(invoice.toJSON()),
-    );
+    const invoices = await this.invoiceModel.find().populate('userId', 'name email');
+    return invoices.map((invoice: Invoice) => new InvoiceResponseDto(invoice.toJSON()));
   }
 
   async findOne(id: string): Promise<InvoiceResponseDto> {
-    const invoice = await this.invoiceModel
-      .findById(id)
-      .populate('userId', 'name email');
+    const invoice = await this.invoiceModel.findById(id).populate('userId', 'name email');
     if (!invoice) {
       throw new NotFoundException('Invoice not found');
     }
@@ -72,23 +57,17 @@ export class InvoicesService {
   }
 
   async findByUser(userId: string): Promise<InvoiceResponseDto[]> {
-    const invoices = await this.invoiceModel
-      .find({ userId })
-      .populate('userId', 'name email');
-    return invoices.map(
-      (invoice: Invoice) => new InvoiceResponseDto(invoice.toJSON()),
-    );
+    const invoices = await this.invoiceModel.find({ userId }).populate('userId', 'name email');
+    return invoices.map((invoice: Invoice) => new InvoiceResponseDto(invoice.toJSON()));
   }
 
   async getMonthlyPurchases(userId: string): Promise<number> {
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
     const purchases = await this.invoiceModel.countDocuments({
       userId,
       createdAt: { $gte: oneMonthAgo },
     });
-
     return purchases;
   }
 }

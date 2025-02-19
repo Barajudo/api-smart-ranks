@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { InvoicesService } from './invoices.service';
@@ -23,10 +15,7 @@ export class InvoicesController {
   @Post()
   @ApiOperation({ summary: 'Create a new invoice' })
   @ApiResponse({ status: 201, type: InvoiceResponseDto })
-  create(
-    @Body() createInvoiceDto: CreateInvoiceDto,
-    @Req() req: RequestWithUser,
-  ) {
+  create(@Body() createInvoiceDto: CreateInvoiceDto, @Req() req: RequestWithUser) {
     const userId = req.user.sub || req.user.id;
     if (!userId) {
       throw new Error('User ID not found in token');
@@ -46,6 +35,13 @@ export class InvoicesController {
   @ApiResponse({ status: 200, type: InvoiceResponseDto })
   findOne(@Param('id') id: string) {
     return this.invoicesService.findOne(id);
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get all invoices for a specific user' })
+  @ApiResponse({ status: 200, type: [InvoiceResponseDto] })
+  findByUser(@Param('userId') userId: string) {
+    return this.invoicesService.findByUser(userId);
   }
 
   @Get('user/:userId/monthly-purchases')

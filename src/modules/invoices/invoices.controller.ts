@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceResponseDto } from './dto/invoice-response.dto';
+import { RequestWithUser } from './interfaces/request.interface';
 
 @ApiTags('invoices')
+@UseGuards(JwtAuthGuard)
 @Controller('invoices')
 export class InvoicesController {
   constructor(private readonly invoicesService: InvoicesService) {}
@@ -12,10 +23,11 @@ export class InvoicesController {
   @Post()
   @ApiOperation({ summary: 'Create a new invoice' })
   @ApiResponse({ status: 201, type: InvoiceResponseDto })
-  create(@Body() createInvoiceDto: CreateInvoiceDto) {
-    // TODO: Get userId from JWT token once auth is implemented
-    const userId = 'temporaryUserId';
-    return this.invoicesService.create(userId, createInvoiceDto);
+  create(
+    @Body() createInvoiceDto: CreateInvoiceDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.invoicesService.create(req.user.id, createInvoiceDto);
   }
 
   @Get()

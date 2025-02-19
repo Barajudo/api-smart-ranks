@@ -27,7 +27,11 @@ export class InvoicesController {
     @Body() createInvoiceDto: CreateInvoiceDto,
     @Req() req: RequestWithUser,
   ) {
-    return this.invoicesService.create(req.user.id, createInvoiceDto);
+    const userId = req.user.sub || req.user.id;
+    if (!userId) {
+      throw new Error('User ID not found in token');
+    }
+    return this.invoicesService.create(userId, createInvoiceDto);
   }
 
   @Get()
@@ -42,13 +46,6 @@ export class InvoicesController {
   @ApiResponse({ status: 200, type: InvoiceResponseDto })
   findOne(@Param('id') id: string) {
     return this.invoicesService.findOne(id);
-  }
-
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Get all invoices for a user' })
-  @ApiResponse({ status: 200, type: [InvoiceResponseDto] })
-  findByUser(@Param('userId') userId: string) {
-    return this.invoicesService.findByUser(userId);
   }
 
   @Get('user/:userId/monthly-purchases')

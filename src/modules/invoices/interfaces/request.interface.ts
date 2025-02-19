@@ -2,7 +2,8 @@ import { Request } from 'express';
 
 export interface RequestWithUser extends Request {
   user: {
-    id: string;
+    sub?: string;
+    id?: string;
     email: string;
     role: string;
   };

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
@@ -12,9 +8,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
-  ) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const existingUser = await this.userModel.findOne({
@@ -29,7 +23,8 @@ export class UsersService {
   }
 
   async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.userModel.find({ isActive: true });
+    const users = await this.userModel.find();
+    console.log({ users });
     return users.map((user: User) => new UserResponseDto(user.toJSON()));
   }
 
@@ -41,10 +36,7 @@ export class UsersService {
     return new UserResponseDto(user.toJSON());
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UserResponseDto> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
     const user = await this.userModel.findOneAndUpdate(
       { _id: id, isActive: true },
       { $set: updateUserDto },

@@ -14,12 +14,9 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    console.log('User found:', user ? 'Yes' : 'No');
 
     if (user) {
-      console.log('Stored password hash:', user.password);
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      console.log('Password valid:', isPasswordValid);
 
       if (isPasswordValid) {
         const { password: _, ...result } = user.toJSON();
